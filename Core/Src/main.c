@@ -40,7 +40,8 @@
 /* USER CODE END PM */
 
 /* Private variables ---------------------------------------------------------*/
-osThreadId defaultTaskHandle;
+osThreadId LED1Handle;
+osThreadId LED2Handle;
 /* USER CODE BEGIN PV */
 
 /* USER CODE END PV */
@@ -48,7 +49,8 @@ osThreadId defaultTaskHandle;
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
-void StartDefaultTask(void const * argument);
+void StartLED1(void const * argument);
+void StartLED2(void const * argument);
 
 /* USER CODE BEGIN PFP */
 
@@ -66,7 +68,6 @@ void StartDefaultTask(void const * argument);
 int main(void)
 {
   /* USER CODE BEGIN 1 */
-
   /* USER CODE END 1 */
 
   /* MCU Configuration--------------------------------------------------------*/
@@ -108,9 +109,13 @@ int main(void)
   /* USER CODE END RTOS_QUEUES */
 
   /* Create the thread(s) */
-  /* definition and creation of defaultTask */
-  osThreadDef(defaultTask, StartDefaultTask, osPriorityNormal, 0, 128);
-  defaultTaskHandle = osThreadCreate(osThread(defaultTask), NULL);
+  /* definition and creation of LED1 */
+  osThreadDef(LED1, StartLED1, osPriorityNormal, 0, 128);
+  LED1Handle = osThreadCreate(osThread(LED1), NULL);
+
+  /* definition and creation of LED2 */
+  osThreadDef(LED2, StartLED2, osPriorityAboveNormal, 0, 128);
+  LED2Handle = osThreadCreate(osThread(LED2), NULL);
 
   /* USER CODE BEGIN RTOS_THREADS */
   /* add threads, ... */
@@ -204,22 +209,42 @@ static void MX_GPIO_Init(void)
 
 /* USER CODE END 4 */
 
-/* USER CODE BEGIN Header_StartDefaultTask */
+/* USER CODE BEGIN Header_StartLED1 */
 /**
-  * @brief  Function implementing the defaultTask thread.
+  * @brief  Function implementing the LED1 thread.
   * @param  argument: Not used
   * @retval None
   */
-/* USER CODE END Header_StartDefaultTask */
-void StartDefaultTask(void const * argument)
+/* USER CODE END Header_StartLED1 */
+void StartLED1(void const * argument)
 {
   /* USER CODE BEGIN 5 */
   /* Infinite loop */
   for(;;)
   {
-    osDelay(1);
+	HAL_GPIO_TogglePin(GPIOC, GPIO_PIN_9);
+    osDelay(500);
   }
   /* USER CODE END 5 */
+}
+
+/* USER CODE BEGIN Header_StartLED2 */
+/**
+* @brief Function implementing the LED2 thread.
+* @param argument: Not used
+* @retval None
+*/
+/* USER CODE END Header_StartLED2 */
+__weak void StartLED2(void const * argument)
+{
+  /* USER CODE BEGIN StartLED2 */
+  /* Infinite loop */
+  for(;;)
+  {
+	HAL_GPIO_TogglePin(GPIOC, GPIO_PIN_8);
+	osDelay(1000);
+  }
+  /* USER CODE END StartLED2 */
 }
 
 /**
